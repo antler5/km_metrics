@@ -18,11 +18,11 @@ class KeymeowEncoder(json.JSONEncoder):
         if isinstance(o, Keyboard):
             return {"name": o.name, "keys": o.keys}
         if isinstance(o, Nstroke):
-            return {"k": o.kind, "s": o.nstroke}
+            return o.nstroke
         if isinstance(o, NstrokeType):
             return o.name[0]
         if isinstance(o, NgramType):
-            return o.name
+            return o.name.capitalize()
         if isinstance(o, NstrokeData):
             return {"ns": o.nstroke, "ams": o.amounts}
         if isinstance(o, Metric):
