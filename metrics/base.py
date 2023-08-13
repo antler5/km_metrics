@@ -33,6 +33,8 @@ def is_roll(a, b, c):
 
 def is_redirect(a, b, c):
     return (a.finger.hand() == b.finger.hand() == c.finger.hand()
+            and a.finger != b.finger
+            and b.finger != c.finger
             and direction(a, b) != direction(b, c))
 
 METRIC_LIST = [
