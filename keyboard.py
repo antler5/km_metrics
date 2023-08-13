@@ -32,7 +32,7 @@ class Finger(Enum):
 
     def kind(self) -> FingerKind:
         if self.value <= 4:
-            return FingerKind(self.value),
+            return FingerKind(self.value)
         else:
             return FingerKind(9 - self.value)
 
@@ -50,6 +50,7 @@ class KeyCoord:
         self.finger = finger
         
 class Keyboard:
-    def __init__(self, keys: List[KeyCoord]):
+    def __init__(self, name: str, keys: List[KeyCoord]):
+        self.name = name
         self.keys = keys
         

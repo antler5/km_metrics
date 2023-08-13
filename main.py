@@ -1,5 +1,6 @@
 import json
 import itertools
+import os
 from enum import Enum
 from typing import List
 from metrics import base
@@ -15,7 +16,21 @@ class KeymeowEncoder(json.JSONEncoder):
         if isinstance(o, KeyCoord):
             return {"pos": o.pos, "x": o.x, "y": o.y, "finger": o.finger.name}
         if isinstance(o, Keyboard):
-            return {"keys": o.keys}
+            return {"name": o.name, "keys": o.keys}
+        if isinstance(o, Nstroke):
+            return {"k": o.kind, "s": o.nstroke}
+        if isinstance(o, NstrokeType):
+            return o.name[0]
+        if isinstance(o, NgramType):
+            return o.name
+        if isinstance(o, NstrokeData):
+            return {"ns": o.nstroke, "ams": o.amounts}
+        if isinstance(o, Metric):
+            return {"name": o.name, "short": o.short, "ngram_type": o.ngram_type}
+        if isinstance(o, MetricAmount):
+            return {"met": o.metric, "amt": o.amount}
+        if isinstance(o, MetricData):
+            return {"metrics": o.metrics, "strokes": o.strokes, "keyboard": o.keyboard}
 
         return super().default(o)
 
@@ -38,14 +53,9 @@ class NstrokeData:
 
 class MetricData:
     def __init__(self, metrics: List[Metric], kb: Keyboard):
-        for metric in metrics:
-            # I have no idea why these become tuples but they do so I fix it here 
-            metric.ngram_type = metric.ngram_type[0]
-            metric.predicate = metric.predicate[0]
-            metric.value = metric.value[0]
-
         self.metrics = metrics
         self.strokes = []
+        self.keyboard = kb
 
         bimetrics = [(idx, m) for (idx, m) in enumerate(metrics) if m.ngram_type in [NgramType.BIGRAM, NgramType.SKIPGRAM]]
         trimetrics = [(idx, m) for (idx, m) in enumerate(metrics) if m.ngram_type == NgramType.TRIGRAM]
@@ -77,28 +87,18 @@ class MetricData:
                 if data.amounts:
                     self.strokes.append(data)
 
-ansi = Keyboard([])
-for col in range(10):
-    for row in range(3):
-        stagger = 0
-        if row == 1:
-            stagger = 0.25
-        elif row == 2:
-            stagger = 0.75
-        if col == 4:
-            finger = Finger.LI
-        elif col == 5:
-            finger = Finger.RI
-        else:
-            finger = Finger(col)
-        key = KeyCoord(Pos(col, row, 0), stagger+col, row, finger)
-        print(key.pos.col, key.pos.row, key.x, key.y, key.finger)
-        ansi.keys.append(key)
+from keyboards import ansi, matrix
 
-data = MetricData(base.METRIC_LIST, ansi)
-for stroke in data.strokes:
-    print(stroke.nstroke.nstroke, [(data.metrics[amt.metric].short, amt.amount) for amt in stroke.amounts])
-json_string = json.dumps(ansi, cls=KeymeowEncoder)
-# print(json_string)
+keyboards = [ansi, matrix]
+
+for k in keyboards:
+    k = k.KEYBOARD
+    print(f"Exporting {k.name}...", end="")
+    data = MetricData(base.METRIC_LIST, k)
+    json_string = json.dumps(data, cls=KeymeowEncoder)
+    f = open(os.path.join("./export/", k.name + ".json"), "w")
+    f.write(json_string)
+    f.close()
+    print(" done")
 
 #generate_metrics(ansi, base.METRIC_LIST)
