@@ -1,5 +1,5 @@
 from keyboard import *
-KEYBOARD = Keyboard("ansi", [])
+KEYBOARD = Keyboard("ansi", [[] for _ in range(10)])
 for col in range(10):
     for row in range(3):
         stagger = 0
@@ -14,4 +14,4 @@ for col in range(10):
         else:
             finger = Finger(col)
         key = KeyCoord(Pos(col, row, 0), stagger+col, row, finger)
-        KEYBOARD.keys.append(key)
+        KEYBOARD.keymap[finger.value].append(key)

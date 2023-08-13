@@ -50,7 +50,7 @@ class KeyCoord:
         self.finger = finger
         
 class Keyboard:
-    def __init__(self, name: str, keys: List[KeyCoord]):
+    def __init__(self, name: str, keymap: List[List[KeyCoord]]):
         self.name = name
-        self.keys = keys
+        self.keymap = keymap
         

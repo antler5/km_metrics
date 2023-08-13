@@ -16,7 +16,7 @@ class KeymeowEncoder(json.JSONEncoder):
         if isinstance(o, KeyCoord):
             return {"pos": o.pos, "x": o.x, "y": o.y, "finger": o.finger.name}
         if isinstance(o, Keyboard):
-            return {"name": o.name, "keys": o.keys}
+            return {"name": o.name, "keys": o.keymap}
         if isinstance(o, Nstroke):
             return o.nstroke
         if isinstance(o, NstrokeType):
@@ -61,7 +61,7 @@ class MetricData:
         trimetrics = [(idx, m) for (idx, m) in enumerate(metrics) if m.ngram_type == NgramType.TRIGRAM]
 
         for size in [2, 3]:
-            for nstroke in itertools.product(enumerate(kb.keys), repeat=size):
+            for nstroke in itertools.product(enumerate(list(itertools.chain.from_iterable(kb.keymap))), repeat=size):
                 kind = NstrokeType.TRISTROKE if size == 3 else NstrokeType.BISTROKE
                 ns = [pair[0] for pair in nstroke] # real nstroke being the indexes of keys
                 keys = [pair[1] for pair in nstroke] # key data for metrics
