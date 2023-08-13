@@ -1,6 +1,17 @@
 from enum import Enum
 from typing import Dict, List
 
+class Hand(Enum):
+    LEFT = 0
+    RIGHT = 1
+
+class FingerKind(Enum):
+    PINKY = 0
+    RING = 1
+    MIDDLE = 2
+    INDEX = 3
+    THUMB = 4
+
 class Finger(Enum):
     LP = 0
     LR = 1
@@ -13,33 +24,22 @@ class Finger(Enum):
     RR = 8
     RP = 9
 
-class Hand(Enum):
-    LEFT = 0
-    RIGHT = 1
+    def hand(self) -> Hand:
+        if self.value <= 4:
+            return Hand.LEFT
+        else:
+            return Hand.RIGHT
 
-class FingerKind(Enum):
-    PINKY = 0
-    RING = 1
-    MIDDLE = 2
-    INDEX = 3
-    THUMB = 4
-
-def hand(f: Finger) -> Hand:
-    if f.value <= 4:
-        return Hand.LEFT
-    else:
-        return Hand.RIGHT
-
-def kind(f: Finger) -> FingerKind:
-    if f.value <= 4:
-        return FingerKind(f.value),
-    else:
-        return FingerKind(9 - f.value)
+    def kind(self) -> FingerKind:
+        if self.value <= 4:
+            return FingerKind(self.value),
+        else:
+            return FingerKind(9 - self.value)
 
 class Pos:
-    def __init__(self, row: int, col: int, layer: int):
-        self.row = row
+    def __init__(self, col: int, row: int, layer: int):
         self.col = col
+        self.row = row
         self.layer = layer
     
 class KeyCoord:
@@ -50,6 +50,6 @@ class KeyCoord:
         self.finger = finger
         
 class Keyboard:
-    def __init__(self, finger_map: Dict[Finger, List[KeyCoord]]):
-        self.finger_map = finger_map
+    def __init__(self, keys: List[KeyCoord]):
+        self.keys = keys
         
