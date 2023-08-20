@@ -16,7 +16,7 @@ class KeymeowEncoder(json.JSONEncoder):
         if isinstance(o, KeyCoord):
             return {"pos": o.pos, "x": o.x, "y": o.y, "finger": o.finger.name}
         if isinstance(o, Keyboard):
-            return {"name": o.name, "keys": o.keymap}
+            return {"name": o.name, "keys": {"map": o.keymap}}
         if isinstance(o, Nstroke):
             return o.nstroke
         if isinstance(o, NstrokeType):
