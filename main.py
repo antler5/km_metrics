@@ -87,9 +87,9 @@ class MetricData:
                 if data.amounts:
                     self.strokes.append(data)
 
-from keyboards import ansi, matrix
+from keyboards import ansi, ansi_angle, matrix, columnar
 
-keyboards = [ansi, matrix]
+keyboards = [ansi, ansi_angle, matrix, columnar]
 
 for k in keyboards:
     k = k.KEYBOARD
