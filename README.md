@@ -4,12 +4,12 @@ It's a messy python codebase I hacked together in a few hours (I'll refactor it 
 
 To export, just run `python3 main.py`.
 
-# writing metrics
+## writing metrics
 Metrics are stored in `metrics/base.py`. 
 A few helper functions are defined, and I think you should get a decent idea of how to write your own metrics from the default ones provided. 
 If something is confusing, feel free to open an issue or contact me.
 
-# defining keyboards
+## defining keyboards
 Keyboards are stored in `keyboards/`.
 This is a little bit jankier and the system most in need of change at the moment. 
 Keyboards are defined very imperatively. This has the advantage of being very flexible,
