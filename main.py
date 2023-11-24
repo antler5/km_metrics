@@ -87,11 +87,9 @@ class MetricData:
                 if data.amounts:
                     self.strokes.append(data)
 
-from keyboards import ansi, ansi_angle, matrix, columnar
+from keyboards import KEYBOARDS
 
-keyboards = [ansi, ansi_angle, matrix, columnar]
-
-for k in keyboards:
+for k in KEYBOARDS:
     k = k.KEYBOARD
     print(f"Exporting {k.name}...", end="")
     data = MetricData(base.METRIC_LIST, k)
