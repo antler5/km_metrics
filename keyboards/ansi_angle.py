@@ -1,12 +1,9 @@
 from keyboard import *
 KEYBOARD = Keyboard("ansi-angle", [[] for _ in range(10)])
+staggers = [0, 0.25, 0.75]
 for col in range(10):
     for row in range(3):
-        stagger = 0
-        if row == 1:
-            stagger = 0.25
-        elif row == 2:
-            stagger = 0.75
+        stagger = staggers[row]
         if col == 4:
             finger = Finger.LI
         elif col == 5:
