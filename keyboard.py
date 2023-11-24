@@ -53,4 +53,10 @@ class Keyboard:
     def __init__(self, name: str, keymap: List[List[KeyCoord]]):
         self.name = name
         self.keymap = keymap
-        
+        self.combos = []
+
+    def compound_nstrokes(self):
+        """Returns a flattened list of nstrokes including combos"""
+        base = itertools.chain.from_iterable(self.keymap)
+        combined = itertools.chain(base, self.combos)
+        return combined
