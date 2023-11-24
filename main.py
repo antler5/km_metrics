@@ -87,12 +87,11 @@ class MetricData:
                 if data.amounts:
                     self.strokes.append(data)
 
-from keyboards import KEYBOARDS
+from keyboard_metrics import KEYBOARDS
 
-for k in KEYBOARDS:
-    k = k.KEYBOARD
+for (k, m) in KEYBOARDS:
     print(f"Exporting {k.name}...", end="")
-    data = MetricData(base.METRIC_LIST, k)
+    data = MetricData(m, k)
     json_string = json.dumps(data, cls=KeymeowEncoder)
     f = open(os.path.join("./export/", k.name + ".json"), "w")
     f.write(json_string)
