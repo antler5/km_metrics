@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Dict, List
+import itertools
 
 class Hand(Enum):
     LEFT = 0
@@ -48,6 +49,10 @@ class KeyCoord:
         self.x = x
         self.y = y
         self.finger = finger
+
+class Combo:
+    def __init__(self, coords: List[KeyCoord]):
+        self.coords = coords
         
 class Keyboard:
     def __init__(self, name: str, keymap: List[List[KeyCoord]]):
@@ -60,3 +65,22 @@ class Keyboard:
         base = itertools.chain.from_iterable(self.keymap)
         combined = itertools.chain(base, self.combos)
         return combined
+
+def split_strokes(first, second):
+    return itertools.product(first.coords if isinstance(first, Combo) else [first],
+                      second.coords if isinstance(second, Combo) else [second])
+
+def eval_split(predicate, split):
+    return [predicate(a, b) for (a, b) in split]
+
+def split(predicate, first, second):
+    """Returns a list containing the result of each split of combos.
+    Example:
+    ```
+    a = Combo([coord(2, 1), coord(3, 1)]) # QWERTY `df` combo
+    b = coord(2, 0) # QWERTY `e`
+    split(is_sfb, a, b) # => [True, False]
+    ```
+    """
+    return eval_split(predicate, split_strokes(first, second))
+

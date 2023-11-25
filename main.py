@@ -16,7 +16,7 @@ class KeymeowEncoder(json.JSONEncoder):
         if isinstance(o, KeyCoord):
             return {"pos": o.pos, "x": o.x, "y": o.y, "finger": o.finger.name}
         if isinstance(o, Keyboard):
-            return {"name": o.name, "keys": {"map": o.keymap}}
+            return {"name": o.name, "keys": {"map": o.keymap}, "combos": o.combos}
         if isinstance(o, Nstroke):
             return o.nstroke
         if isinstance(o, NstrokeType):
@@ -31,7 +31,9 @@ class KeymeowEncoder(json.JSONEncoder):
             return {"met": o.metric, "amt": o.amount}
         if isinstance(o, MetricData):
             return {"metrics": o.metrics, "strokes": o.strokes, "keyboard": o.keyboard}
-
+        if isinstance(o, Combo):
+            return {"coords": o.coords}
+        print(o)
         return super().default(o)
 
 NstrokeType = Enum("NstrokeType", ["MONOSTROKE", "BISTROKE", "TRISTROKE"])
@@ -51,6 +53,9 @@ class NstrokeData:
         self.nstroke = nstroke
         self.amounts = amounts
 
+def has_combo(keys):
+    return True in [isinstance(key, Combo) for key in keys]
+
 class MetricData:
     def __init__(self, metrics: List[Metric], kb: Keyboard):
         self.metrics = metrics
@@ -61,7 +66,7 @@ class MetricData:
         trimetrics = [(idx, m) for (idx, m) in enumerate(metrics) if m.ngram_type == NgramType.TRIGRAM]
 
         for size in [2, 3]:
-            for nstroke in itertools.product(enumerate(list(itertools.chain.from_iterable(kb.keymap))), repeat=size):
+            for nstroke in itertools.product(enumerate(list(kb.compound_nstrokes())), repeat=size):
                 kind = NstrokeType.TRISTROKE if size == 3 else NstrokeType.BISTROKE
                 ns = [pair[0] for pair in nstroke] # real nstroke being the indexes of keys
                 keys = [pair[1] for pair in nstroke] # key data for metrics
@@ -71,17 +76,29 @@ class MetricData:
                     b = keys[1]
                     is_static_val = isinstance(m.value, int)
                     matches = False
-                    value = False
+                    value = 0
                     if size == 2:
-                        matches = m.predicate(a, b)
-                        value = m.value(a, b) if not is_static_val else False
+                        if m.splittable and has_combo(keys):
+                            split = split_strokes(a, b)
+                            for (x, y) in split:
+                                if m.predicate(x, y):
+                                    matches = True
+                                    value += m.value(x, y) if not is_static_val else m.value
+                        else:
+                            matches = m.predicate(a, b)
+                            value = m.value(a, b) if not is_static_val else 0
                     else:
-                        c = keys[2]
-                        matches = m.predicate(a, b, c)
-                        value = m.value(a, b, c) if not is_static_val else False
+                        if not m.splittable:
+                            c = keys[2]
+                            matches = m.predicate(a, b, c)
+                            value = m.value(a, b, c) if not is_static_val else 0
+                        else:
+                            print("Warning: tristroke metrics cannot be automatically split")
                     if not matches:
                         continue
                     if not value:
+                        if not is_static_val:
+                            continue
                         value = m.value
                     data.amounts.append(MetricAmount(idx, value))
                 if data.amounts:
