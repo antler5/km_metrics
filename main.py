@@ -24,11 +24,11 @@ class KeymeowEncoder(json.JSONEncoder):
         if isinstance(o, NgramType):
             return o.name.capitalize()
         if isinstance(o, NstrokeData):
-            return {"ns": o.nstroke, "ams": o.amounts}
+            return [o.nstroke, o.amounts]
         if isinstance(o, Metric):
             return {"name": o.name, "short": o.short, "ngram_type": o.ngram_type}
         if isinstance(o, MetricAmount):
-            return {"met": o.metric, "amt": o.amount}
+            return [o.metric, o.amount]
         if isinstance(o, MetricData):
             return {"metrics": o.metrics, "strokes": o.strokes, "keyboard": o.keyboard}
         if isinstance(o, Combo):
@@ -36,6 +36,34 @@ class KeymeowEncoder(json.JSONEncoder):
         print(o)
         return super().default(o)
 
+def encode_metricdata(o):
+    if isinstance(o, Pos):
+        return {"row": o.row, "col": o.col, "layer": o.layer}
+    if isinstance(o, Finger):
+        return o.name
+    if isinstance(o, KeyCoord):
+        return {"pos": o.pos, "x": o.x, "y": o.y, "finger": o.finger.name}
+    if isinstance(o, Keyboard):
+        return {"name": o.name, "keys": {"map": o.keymap}, "combos": o.combos}
+    if isinstance(o, Nstroke):
+        return o.nstroke
+    if isinstance(o, NstrokeType):
+        return o.name[0]
+    if isinstance(o, NgramType):
+        return o.name.capitalize()
+    if isinstance(o, NstrokeData):
+        return [o.nstroke, o.amounts]
+    if isinstance(o, Metric):
+        return {"name": o.name, "short": o.short, "ngram_type": o.ngram_type}
+    if isinstance(o, MetricAmount):
+        return [o.metric, o.amount]
+    if isinstance(o, MetricData):
+        return {"metrics": o.metrics, "strokes": o.strokes, "keyboard": o.keyboard}
+    if isinstance(o, Combo):
+        return {"coords": o.coords}
+    print(o)
+    return super().default(o)
+    
 NstrokeType = Enum("NstrokeType", ["MONOSTROKE", "BISTROKE", "TRISTROKE"])
 
 class Nstroke:
@@ -110,6 +138,7 @@ class MetricData:
 
 from keyboard_metrics import KEYBOARDS
 import time
+import msgpack
 
 total_evaluated = 0
 total_matched = 0
@@ -119,9 +148,9 @@ for (k, m) in KEYBOARDS:
     data = MetricData(m, k)
     total_evaluated += data.nstrokes_measured
     total_matched += data.nstrokes_matched
-    json_string = json.dumps(data, cls=KeymeowEncoder)
-    f = open(os.path.join("./export/", k.name + ".json"), "w")
-    f.write(json_string)
+    packed = msgpack.packb(data, default=encode_metricdata)
+    f = open(os.path.join("./export/", k.name + ".metrics"), "wb")
+    f.write(packed)
     f.close()
     print(f" done ({round(100 * data.nstrokes_matched / data.nstrokes_measured)}%)")
 
