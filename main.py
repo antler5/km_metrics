@@ -60,6 +60,8 @@ class MetricData:
     def __init__(self, metrics: List[Metric], kb: Keyboard):
         self.metrics = metrics
         self.strokes = []
+        self.nstrokes_measured = 0
+        self.nstrokes_matched = 0
         self.keyboard = kb
 
         bimetrics = [(idx, m) for (idx, m) in enumerate(metrics) if m.ngram_type in [NgramType.BIGRAM, NgramType.SKIPGRAM]]
@@ -72,6 +74,7 @@ class MetricData:
                 keys = [pair[1] for pair in nstroke] # key data for metrics
                 data = NstrokeData(Nstroke(kind, ns), [])
                 for idx, m in bimetrics if size == 2 else trimetrics:
+                    self.nstrokes_measured += 1
                     a = keys[0]
                     b = keys[1]
                     is_static_val = isinstance(m.value, int)
@@ -96,6 +99,7 @@ class MetricData:
                             print("Warning: tristroke metrics cannot be automatically split")
                     if not matches:
                         continue
+                    self.nstrokes_matched += 1
                     if not value:
                         if not is_static_val:
                             continue
@@ -105,14 +109,24 @@ class MetricData:
                     self.strokes.append(data)
 
 from keyboard_metrics import KEYBOARDS
+import time
 
+total_evaluated = 0
+total_matched = 0
+start = time.time()
 for (k, m) in KEYBOARDS:
     print(f"Exporting {k.name}...", end="")
     data = MetricData(m, k)
+    total_evaluated += data.nstrokes_measured
+    total_matched += data.nstrokes_matched
     json_string = json.dumps(data, cls=KeymeowEncoder)
     f = open(os.path.join("./export/", k.name + ".json"), "w")
     f.write(json_string)
     f.close()
-    print(" done")
+    print(f" done ({round(100 * data.nstrokes_matched / data.nstrokes_measured)}%)")
+
+elapsed = time.time() - start
+print(f"Evaluated {total_evaluated} nstrokes in {elapsed:.2f} seconds ({round(total_evaluated/elapsed)} per second)")
+print(f"{round(100 * total_matched / total_evaluated)}% of nstrokes matched a metric")
 
 #generate_metrics(ansi, base.METRIC_LIST)
