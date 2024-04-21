@@ -136,6 +136,13 @@ class MetricData:
                 if data.amounts:
                     self.strokes.append(data)
 
+def check_keyboard(kb: Keyboard):
+    for (finger, keys) in enumerate(kb.keymap):
+        for key in keys:
+            if finger != key.finger.value:
+                print(f"WARNING: keyboard {kb.name} has key with finger {key.finger} in {Finger(finger)} list")
+            
+
 from keyboard_metrics import KEYBOARDS
 import time
 import msgpack
@@ -143,6 +150,9 @@ import msgpack
 total_evaluated = 0
 total_matched = 0
 start = time.time()
+
+for (k, _) in KEYBOARDS:
+    check_keyboard(k)
 for (k, m) in KEYBOARDS:
     print(f"Exporting {k.name}...", end="")
     data = MetricData(m, k)
