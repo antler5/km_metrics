@@ -55,9 +55,18 @@ def is_sfb(a, b):
     return (not is_sfr(a, b)
             and a.finger == b.finger)
 
+def has_repeat(a, b):
+    return True in split(lambda a, b : a == b, a, b)
+
 def has_same_finger(a, b):
     """Returns true if any of the combo splits contains two positions pressed with the same finger."""
     return True in split(lambda a, b : a.finger == b.finger, a, b)
+
+def is_sft(a, b, c):
+    return (has_same_finger(a, b)
+            and not has_repeat(a, b)
+            and has_same_finger(b, c)
+            and not has_repeat(b, c))
 
 def is_lsb(a, b):
     return (a.finger.hand() == b.finger.hand()
@@ -73,20 +82,50 @@ def is_roll(a, b, c):
             and not has_same_finger(a, b)
             and not has_same_finger(b, c))
 
+def is_miniroll(a, b):
+    return (same_hands(a, b)
+            and not has_same_finger(a, b))
+
 def is_redirect(a, b, c):
     return (same_hands(a, b) and same_hands(b, c)
             and not has_same_finger(a, b)
             and not has_same_finger(b, c)
             and direction(a, b) != direction(b, c))
 
+def is_sfs_redirect(a, b, c):
+    return (is_redirect(a, b, c)
+            and has_same_finger(a, c)
+            and not has_repeat(a, c))
+
+def is_trill_redirect(a, b, c):
+    return (is_redirect(a, b, c)
+            and has_repeat(a, c))
+
+def is_sfs_redirect(a, b, c):
+    return (is_redirect(a, b, c)
+            and has_same_finger(a, c))
+
+def is_mini3roll(a, b, c):
+    return (same_hands(a, b) and same_hands(b, c)
+            and not has_same_finger(a, b)
+            and not has_same_finger(b, c)
+            and direction(a, b) == direction(b, c))
+
 def is_same_row_roll(a, b, c):
     return (is_roll(a, b, c)
             and same_rows(a, b)
             and same_rows(b, c))
 
+def misc_trigram(a, b, c):
+    return (not is_roll(a, b, c)
+            and not is_alternate(a, b, c)
+            and not is_redirect(a, b, c)
+            and not is_mini3roll(a, b, c))
+
 METRIC_LIST = [
     Metric("Same-finger Repeats", "sfr", NgramType.BIGRAM, is_sfr, 1, True),
     Metric("Same-finger Bigrams", "sfb", NgramType.BIGRAM, is_sfb, 1, True),
+    Metric("Same-finger Trigrams", "sft", NgramType.TRIGRAM, is_sft, 1, False),
     Metric("Same-finger Skipgrams", "sfs", NgramType.SKIPGRAM, is_sfb, 1, True),
     Metric("Same-finger Bigram Distance", "sfb-dist", NgramType.BIGRAM, is_sfb, distance, True),
     Metric("Same-finger Skipgram Distance", "sfs-dist", NgramType.SKIPGRAM, is_sfb, distance, True),
@@ -95,5 +134,15 @@ METRIC_LIST = [
     Metric("Alternates", "alt", NgramType.TRIGRAM, is_alternate, 1, False),
     Metric("Rolls", "roll", NgramType.TRIGRAM, is_roll, 1, False),
     Metric("Same-row Rolls", "sr-roll", NgramType.TRIGRAM, is_same_row_roll, 1, False),
-    Metric("Redirects", "redir", NgramType.TRIGRAM, is_redirect, 1, False)
+    Metric("Redirects", "redir", NgramType.TRIGRAM, is_redirect, 1, False),
+    Metric("Same-finger-skip Redirects", "sfs-redir", NgramType.TRIGRAM, is_sfs_redirect, 1, False),
+    Metric("Trill Redirects", "trill-redir", NgramType.TRIGRAM, is_trill_redirect, 1, False),
+    Metric("Mini 3rolls", "m3roll", NgramType.TRIGRAM, is_mini3roll, 1, False),
+    Metric("Misc Tristrokes", "misc", NgramType.TRIGRAM, misc_trigram, 1, False),
+    
+    Metric("Skipalts", "skipalt", NgramType.SKIPGRAM, different_hands, 1, True),
+    Metric("Skiprolls", "skiproll", NgramType.SKIPGRAM, is_miniroll, 1, True),
+    Metric("Minirolls", "miniroll", NgramType.BIGRAM, is_miniroll, 1, True),
+    Metric("Minialternates", "minialt", NgramType.BIGRAM, different_hands, 1, True),
+
 ]
