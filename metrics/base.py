@@ -82,6 +82,16 @@ def is_roll(a, b, c):
             and not has_same_finger(a, b)
             and not has_same_finger(b, c))
 
+def is_inroll(a, b, c):
+    return (is_roll(a, b, c)
+            and (direction(a, b) == Direction.INWARD
+               or direction(b, c) == Direction.INWARD))
+
+def is_outroll(a, b, c):
+    return (is_roll(a, b, c)
+            and (direction(a, b) == Direction.OUTWARD
+               or direction(b, c) == Direction.OUTWARD))
+
 def is_miniroll(a, b):
     return (same_hands(a, b)
             and not has_same_finger(a, b))
@@ -133,6 +143,8 @@ METRIC_LIST = [
     Metric("Lateral Stretch Bigram Distance", "lsb-dist", NgramType.BIGRAM, is_lsb, x_distance, True),
     Metric("Alternates", "alt", NgramType.TRIGRAM, is_alternate, 1, False),
     Metric("Rolls", "roll", NgramType.TRIGRAM, is_roll, 1, False),
+    Metric("Inrolls", "inroll", NgramType.TRIGRAM, is_inroll, 1, False),
+    Metric("Outrolls", "outroll", NgramType.TRIGRAM, is_outroll, 1, False),
     Metric("Same-row Rolls", "sr-roll", NgramType.TRIGRAM, is_same_row_roll, 1, False),
     Metric("Redirects", "redir", NgramType.TRIGRAM, is_redirect, 1, False),
     Metric("Same-finger-skip Redirects", "sfs-redir", NgramType.TRIGRAM, is_sfs_redirect, 1, False),
