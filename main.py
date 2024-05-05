@@ -141,6 +141,13 @@ def check_keyboard(kb: Keyboard):
         for key in keys:
             if finger != key.finger.value:
                 print(f"WARNING: keyboard {kb.name} has key with finger {key.finger} in {Finger(finger)} list")
+
+    for combo in kb.combos:
+        for ckey in combo.coords:
+            contained = any(map(lambda p: p.row == ckey.pos.row and p.col == ckey.pos.col, [k.pos for keys in kb.keymap for k in keys]))
+            if not contained:
+                print(f"WARNING: keyboard {kb.name} has combo involving nonexistent key ({ckey.pos.col}, {ckey.pos.row})")
+                
             
 
 from keyboard_metrics import KEYBOARDS
