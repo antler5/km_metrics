@@ -102,18 +102,14 @@ def is_redirect(a, b, c):
             and not has_same_finger(b, c)
             and direction(a, b) != direction(b, c))
 
-def is_sfs_redirect(a, b, c):
-    return (is_redirect(a, b, c)
-            and has_same_finger(a, c)
-            and not has_repeat(a, c))
-
 def is_trill_redirect(a, b, c):
     return (is_redirect(a, b, c)
             and has_repeat(a, c))
 
 def is_sfs_redirect(a, b, c):
     return (is_redirect(a, b, c)
-            and has_same_finger(a, c))
+            and has_same_finger(a, c)
+            and not has_repeat(a, c))
 
 def is_mini3roll(a, b, c):
     return (same_hands(a, b) and same_hands(b, c)
@@ -156,5 +152,4 @@ METRIC_LIST = [
     Metric("Skiprolls", "skiproll", NgramType.SKIPGRAM, is_miniroll, 1, True),
     Metric("Minirolls", "miniroll", NgramType.BIGRAM, is_miniroll, 1, True),
     Metric("Minialternates", "minialt", NgramType.BIGRAM, different_hands, 1, True),
-
 ]
