@@ -1,6 +1,6 @@
 ## Import whichever keyboard and metric modules you want here.
 from keyboards import matrix, matrix_thumbs, columnar, ansi, ansi_angle, combo_test, taipo
-from metrics import base
+from metrics import base, taipo_metrics
 
 ## The second field for each keyboard is the set of metric lists. You
 ## can have multiple per keyboard.
@@ -10,7 +10,7 @@ KEYBOARDS = [
     (columnar, [base]),
     (ansi, [base]),
     (ansi_angle, [base]),
-    (taipo, [base])
+    (taipo, [taipo_metrics])
 ]
 
 
