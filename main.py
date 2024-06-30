@@ -161,7 +161,7 @@ start = time.time()
 for (k, _) in KEYBOARDS:
     check_keyboard(k)
 for (k, m) in KEYBOARDS:
-    print(f"Exporting {k.name}...", end="")
+    print(f"Exporting {k.name} ({len(list(k.compound_nstrokes()))} keys)...", end="", flush=True)
     data = MetricData(m, k)
     total_evaluated += data.nstrokes_measured
     total_matched += data.nstrokes_matched
