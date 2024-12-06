@@ -1,21 +1,19 @@
-# km_metrics
-The base metric exporter for Keymeow. 
-It's a messy python codebase I hacked together in a few hours (I'll refactor it eventually). 
+Data-fetching library for the keycat reference suite.
 
-To export, just run `python3 main.py`.
+# Upstream
 
-## writing metrics
-Metrics are stored in `metrics/base.py`. 
-A few helper functions are defined, and I think you should get a decent idea of how to write your own metrics from the default ones provided. 
-If something is confusing, feel free to open an issue or contact me.
+Find the upstream repository here!
 
-## defining keyboards
-Keyboards are stored in `keyboards/`.
-This is a little bit jankier and the system most in need of change at the moment. 
-Keyboards are defined very imperatively. This has the advantage of being very flexible,
-and has the disadvantage of being extremely inelegant and unreadable.
+https://github.com/semilin/km_metrics
 
-The main thing you need to know is that keyboards store 
-a dictionary mapping finger to a physical key position. Idiomatically, the order of insertion
-should be top-to-bottom, left-to-right physically, as this is how [keymeow](https://github.com/semilin/keymeow)
-tries to map layouts onto keyboards. Again, see the default keyboards for examples.
+# Changelog
+
+```
+2024-12-05  antlers  <antlers@illucid.net>
+
+        Add chorded keyboard (2x4+Thumb)
+        * keyboard_metrics.py: Rename taipo_metrics to chorded_metrics.
+        * keyboard_metrics.py: Add chorded keyboard metrics to exports.
+        * keyboards/chorded.py: New file.
+        * metrics/chorded_metrics.py: Renamed `taipo_metrics.py` to `chorded_metrics.py`.
+```
