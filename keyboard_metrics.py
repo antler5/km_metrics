@@ -5,15 +5,15 @@ from metrics import base, crescent_metrics, chorded_metrics
 ## The second field for each keyboard is the set of metric lists. You
 ## can have multiple per keyboard.
 KEYBOARDS = [
-    (matrix, [base]),
-    (matrix_thumbs, [base]),
+    # (matrix, [base]),
+    # (matrix_thumbs, [base]),
     (columnar, [base]),
     (columnar_thumbs, [base]),
-    (ansi, [base]),
-    (ansi_angle, [base]),
-    (taipo, [chorded_metrics]),
-    (crescent, [crescent_metrics]),
-    (combo_16, [crescent_metrics]),
+    # (ansi, [base]),
+    # (ansi_angle, [base]),
+    # (taipo, [chorded_metrics]),
+    # (crescent, [crescent_metrics]),
+    # (combo_16, [crescent_metrics]),
     (chorded, [chorded_metrics])
 ]
 
