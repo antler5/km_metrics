@@ -13,6 +13,7 @@ for col in range(4):
         KEYBOARD.keymap[key.finger.value].append(key)
 
 KEYBOARD.keymap[Finger.RT.value].append(KeyCoord(Pos(0, 2, 0), 0, 2, Finger.RT))
+KEYBOARD.keymap[Finger.RT.value].append(KeyCoord(Pos(1, 2, 0), 1, 2, Finger.RT))
 
 coords = [(col,row)
           for col in range(0,4)
@@ -25,6 +26,8 @@ combos = set([
     for a in coords
     for b in coords
     if len(set([a,b])) == 2
+    # Same-row combos only.
+    and len(set(map(lambda x: x[1], [a,b]))) == 1
 ])
 
 # trichords
@@ -36,34 +39,52 @@ combos = combos.union(set([
     if len(set([a,b,c])) == 3
     # Stacks on the same finger are ok, but not with a third key.
     and len(set(map(lambda x: x[0], [a,b,c]))) == 3
+    # Same-row combos only.
+    and len(set(map(lambda x: x[1], [a,b,c]))) == 1
 ]))
+
+# thumb bichords
+combos = combos.union(set([
+    frozenset(((0,2),b))
+    for b in coords
+    if len(set([(0,2),b])) == 2
+]))
+
+# thumb trichords
+combos = combos.union(set([
+    frozenset(((0,2),b,c))
+    for b in coords
+    for c in coords
+    if len(set([(0,2),b,c])) == 3
+    # Stacks on the same finger are ok, but not with a third key.
+    and len(set(map(lambda x: x[0], [(0,2),b,c]))) == 3
+    # Same-row combos only.
+    and len(set(map(lambda x: x[1], [b,c]))) == 1
+]))
+
+# Whitelist of cross-row combos
+
+# BRP & Top row singles
+combos = combos.union(set([
+    frozenset(((3,1),b))
+    for b in [(col,0) for col in [0,1,2]]
+]))
+# plus thumb
+combos = combos.union(set([
+    frozenset(((0,2),(3,1),b))
+    for b in [(col,0) for col in [0,1,2]]
+]))
+
+# BRP & Top row doubles
+combos = combos.union(set([
+    frozenset(((3,1),b,c))
+    for b in [(col,0) for col in [0,1,2]]
+    for c in [(col,0) for col in [0,1,2]]
+    if b != c
+]))
+
+# BRR & TRI
+combos = combos.union(set([frozenset(((2,1),(0,0)))]))
 
 KEYBOARD.combos = [Combo(list(map(lambda col,row: coord(col,row), *zip(*xs))))
                    for xs in sorted(combos)]
-
-def finger(c):
-    match c:
-        case (0,0):
-            return "TRI"
-        case (1,0):
-            return "TRM"
-        case (2,0):
-            return "TRR"
-        case (3,0):
-            return "TRP"
-        case (0,1):
-            return "BRI"
-        case (1,1):
-            return "BRM"
-        case (2,1):
-            return "BRR"
-        case (3,1):
-            return "BRP"
-        case (0,2):
-            return "RT"
-        case _:
-            print("fuck")
-            quit()
-
-for x in KEYBOARD.combos:
-    print([finger((y.x,y.y)) for y in x.coords])
