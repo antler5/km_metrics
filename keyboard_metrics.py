@@ -1,5 +1,5 @@
 ## Import whichever keyboard and metric modules you want here.
-from keyboards import matrix, matrix_thumbs, columnar, ansi, ansi_angle, combo_test, taipo, crescent, combo_16, chorded
+from keyboards import ansi, ansi_angle, chorded, columnar, combo_16, combo_test, crescent, matrix, matrix_thumbs, taipo
 from metrics import base, crescent_metrics, chorded_metrics
 
 ## The second field for each keyboard is the set of metric lists. You
