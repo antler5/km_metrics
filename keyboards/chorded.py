@@ -3,7 +3,7 @@ KEYBOARD = Keyboard("chorded", [[] for _ in range(10)])
 
 def coord(col, row):
     fingers = [Finger.RI, Finger.RM, Finger.RR, Finger.RP]
-    finger = fingers[col]
+    finger = Finger.RT if row == 2 else fingers[col]
     key = KeyCoord(Pos(col, row, 0), col, row, finger)
     return key
 
