@@ -1,9 +1,9 @@
 from keyboard import *
-KEYBOARD = Keyboard("2x4_all_combos", [[] for _ in range(10)])
+KEYBOARD = Keyboard("k_2x4_2t_all_combos", [[] for _ in range(10)])
 
 def coord(col, row):
     fingers = [Finger.RI, Finger.RM, Finger.RR, Finger.RP]
-    finger = fingers[col]
+    finger = Finger.RT if row == 2 else fingers[col]
     key = KeyCoord(Pos(col, row, 0), col, row, finger)
     return key
 
@@ -12,9 +12,14 @@ for col in range(4):
         key = coord(col, row)
         KEYBOARD.keymap[key.finger.value].append(key)
 
+KEYBOARD.keymap[Finger.RT.value].append(KeyCoord(Pos(0, 2, 0), 0, 2, Finger.RT))
+KEYBOARD.keymap[Finger.RT.value].append(KeyCoord(Pos(1, 2, 0), 1, 2, Finger.RT))
+
 coords = [(col,row)
           for col in range(0,4)
           for row in range(0,2)]
+coords.append((0,2))
+coords.append((1,2))
 
 # bichords
 combos = set([
